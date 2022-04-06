@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sapr Server</title>
+        <meta charset="utf-8">
+        <meta name="author" content="Sapr">
+        <style>
+            .switch {
+              position: relative;
+              display: inline-block;
+              width: 60px;
+              height: 34px;
+            }
+            
+            .switch input {display:none;}
+            
+            .slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: #ccc;
+              -webkit-transition: .4s;
+              transition: .4s;
+            }
+            
+            .slider:before {
+              position: absolute;
+              content: "";
+              height: 26px;
+              width: 26px;
+              left: 4px;
+              bottom: 4px;
+              background-color: white;
+              -webkit-transition: .4s;
+              transition: .4s;
+            }
+            
+            input:checked + .slider {
+              background-color: #2196F3;
+            }
+            
+            input:focus + .slider {
+              box-shadow: 0 0 1px #2196F3;
+            }
+            
+            input:checked + .slider:before {
+              -webkit-transform: translateX(26px);
+              -ms-transform: translateX(26px);
+              transform: translateX(26px);
+            }
+            
+            /* Rounded sliders */
+            .slider.round {
+              border-radius: 34px;
+            }
+            
+            .slider.round:before {
+              border-radius: 50%;
+            }
+            .positioned {
+                position: relative;
+                left: 300px;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Sapr Server</h2>
+        <h1>Сервак работает)</h1>
+        <h1 id="onflag_state">Состояние:</h1>
+        <label class="switch" id="onflag_label">
+            <input type="checkbox" onchange="toggleCheckbox(this)" id="onflag_toggle"><span class="slider round"></span>
+        </label>
+        <h1 id="mode_state">Режим </h1> <button name="mode" onclick="modeButtonCheckbox(this)" id="mode_button">Переключить</button>
+        <h1 id="hum_state">Влажность </h1>
+        <h1 id="tem_state">Температура </h1>
+        <script>
+            var onflag_old = 0;
+            function update(){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update", true);
+                xhr.responseType = 'text';
+                xhr.onload = function() //Когда сервер пришлёт ответ
+                {
+                    var hum = xhr.getResponseHeader("Hum"); //Считывание заголовка "Hum"
+                    var tem = xhr.getResponseHeader("Tem"); //Считывание заголовка "Tem"
+                    var onflag = xhr.getResponseHeader("Onflag"); //Считывание заголовка "Onflag"
+                    var mode = xhr.getResponseHeader("Mode"); //Считывание заголовка "Mode"
+                    var element_text = document.getElementById("onflag_state"); //Получаем элемент с текстом состояния часов
+                    var str = "Состояние: ";
+                    if(onflag == 1){
+                        str += "Вкл";
+                    }else{
+                        str += "Выкл";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода у onflag
+                    if(!(onflag == onflag_old)) {
+                        element_text = document.getElementById("onflag_label"); //Получаем элемент с галочкой состояния часов
+                        str = "<input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"onflag_toggle\"";
+                        if(onflag == 1){
+                            str += " checked";
+                        }
+                        str += "><span class=\"slider round\"></span>";
+                        element_text.innerHTML = str; //Заменяем часть html кода у onflag
+                        onflag_old = onflag;
+                    }
+                    element_text = document.getElementById("mode_state"); //Получаем элемент с текстом режима часов
+                    str = "Режим ";
+                    if(mode == 0){
+                        str += "Время";
+                    }else if(mode == 1){
+                        str += "Дата";
+                    }else if(mode == 2){
+                        str += "Температура";
+                    }else if(mode == 3){
+                        str += "Влажность";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода у mode
+                    element_text = document.getElementById("hum_state"); //Получаем элемент с текстом режима часов
+                    str = "Влажность " + hum + "%";
+                    element_text.innerHTML = str; //Заменяем часть html кода у hum
+                    element_text = document.getElementById("tem_state"); //Получаем элемент с текстом режима часов
+                    str = "Температура " + tem + "°C";
+                    element_text.innerHTML = str; //Заменяем часть html кода у tem
+                };  
+                xhr.send();
+            }
+            function modeButtonCheckbox(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+1, true);
+                xhr.responseType = 'text';
+                xhr.onload = function() //Когда сервер пришлёт ответ
+                {
+                    var mode = xhr.getResponseHeader("Mode"); //Считывание заголовка "Mode"
+                    var element_text = document.getElementById("mode_state"); //Получаем элемент с текстом режима часов
+                    var str = "Режим ";
+                    if(mode == 0){
+                        str += "Время";
+                    }else if(mode == 1){
+                        str += "Дата";
+                    }else if(mode == 2){
+                        str += "Температура";
+                    }else if(mode == 3){
+                        str += "Влажность";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода
+                };  
+                xhr.send();
+            }
+            function toggleCheckbox(element){ //Функция обработки галочки
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+String(Number(element.checked)), true);
+                xhr.responseType = 'text';
+                xhr.onload = function() //Когда сервер пришлёт ответ
+                { 
+                    var onflag = xhr.getResponseHeader("Onflag"); //Считывание заголовка "Onflag"
+                    var element_text = document.getElementById("onflag_state"); //Получаем элемент с галочкой и текстом состояния часов
+                    var str = "Состояние: ";
+                    if(onflag == 1){
+                        str += "Вкл";
+                    }else{
+                        str += "Выкл";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода у onflag
+                };  
+                xhr.send();
+            }
+            setInterval(update,200);
+        </script>
+    </body>
+</html>
