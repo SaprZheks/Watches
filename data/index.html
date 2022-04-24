@@ -5,6 +5,222 @@
         <meta charset="utf-8">
         <meta name="author" content="Sapr">
         <style>
+            body{
+                background-color: #221e14; /* Цвет фона веб-страницы */
+            }
+            h1 {
+                color: #F2BF6C; /* Цвет текста */
+            }
+            h2 {
+                color: #F2BF6C; /* Цвет текста */
+            }
+            input[type=range].range {
+                -webkit-appearance: none;
+                background-color: #221e14;
+            }
+
+            /*progress support*/
+            input[type=range].range.slider-progress {
+            --range: calc(var(--max) - var(--min));
+            --ratio: calc((var(--value) - var(--min)) / var(--range));
+            --sx: calc(0.5 * 1em + var(--ratio) * (100% - 1em));
+            }
+
+            input[type=range].range:focus {
+            outline: none;
+            }
+
+            /*webkit*/
+            input[type=range].range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 1em;
+            height: 2.5em;
+            border-radius: 1.6em;
+            background: #F2BF6C;
+            border: none;
+            box-shadow: none;
+            margin-top: calc(2.5em * 0.5 - 2.5em * 0.5);
+            }
+
+            input[type=range].range::-webkit-slider-runnable-track {
+            height: 2.5em;
+            border: none;
+            border-radius: 0.5em;
+            background: #E2DED3;
+            box-shadow: none;
+            }
+
+            input[type=range].range::-webkit-slider-thumb:hover {
+            background: #FFDBA0;
+            }
+
+            input[type=range].range::-webkit-slider-thumb:active {
+            background: #724717;
+            }
+
+            input[type=range].range.slider-progress::-webkit-slider-runnable-track {
+            background: linear-gradient(#F2BF6C,#F2BF6C) 0/var(--sx) 100% no-repeat, #E2DED3;
+            }
+
+            input[type=range].range.slider-progress:hover::-webkit-slider-runnable-track {
+            background: linear-gradient(#FFDBA0,#FFDBA0) 0/var(--sx) 100% no-repeat, #E2DED3;
+            }
+
+            input[type=range].range.slider-progress:active::-webkit-slider-runnable-track {
+            background: linear-gradient(#724717,#724717) 0/var(--sx) 100% no-repeat, #E2DED3;
+            }
+
+            /*mozilla*/
+            input[type=range].range::-moz-range-thumb {
+            width: 1em;
+            height: 2.5em;
+            border-radius: 1.6em;
+            background: #F2BF6C;
+            border: none;
+            box-shadow: none;
+            }
+
+            input[type=range].range::-moz-range-track {
+            height: 2.5em;
+            border: none;
+            border-radius: 0.5em;
+            background: #E2DED3;
+            box-shadow: none;
+            }
+
+            input[type=range].range::-moz-range-thumb:hover {
+            background: #FFDBA0;
+            }
+
+            input[type=range].range::-moz-range-thumb:active {
+            background: #724717;
+            }
+
+            input[type=range].range.slider-progress::-moz-range-track {
+            background: linear-gradient(#F2BF6C,#F2BF6C) 0/var(--sx) 100% no-repeat, #E2DED3;
+            }
+
+            input[type=range].range.slider-progress:hover::-moz-range-track {
+            background: linear-gradient(#FFDBA0,#FFDBA0) 0/var(--sx) 100% no-repeat, #E2DED3;
+            }
+
+            input[type=range].range.slider-progress:active::-moz-range-track {
+            background: linear-gradient(#724717,#724717) 0/var(--sx) 100% no-repeat, #E2DED3;
+            }
+
+            /*ms*/
+            input[type=range].range::-ms-fill-upper {
+            background: transparent;
+            border-color: transparent;
+            }
+
+            input[type=range].range::-ms-fill-lower {
+            background: transparent;
+            border-color: transparent;
+            }
+
+            input[type=range].range::-ms-thumb {
+            width: 1em;
+            height: 2.5em;
+            border-radius: 1.6em;
+            background: #F2BF6C;
+            border: none;
+            box-shadow: none;
+            margin-top: 0;
+            box-sizing: border-box;
+            }
+
+            input[type=range].range::-ms-track {
+            height: 2.5em;
+            border-radius: 0.5em;
+            background: #E2DED3;
+            border: none;
+            box-shadow: none;
+            box-sizing: border-box;
+            }
+
+            input[type=range].range::-ms-thumb:hover {
+            background: #FFDBA0;
+            }
+
+            input[type=range].range::-ms-thumb:active {
+            background: #724717;
+            }
+
+            input[type=range].range.slider-progress::-ms-fill-lower {
+            height: 2.5em;
+            border-radius: 0.5em 0 0 0.5em;
+            margin: -undefined 0 -undefined -undefined;
+            background: #F2BF6C;
+            border: none;
+            border-right-width: 0;
+            }
+
+            input[type=range].range.slider-progress:hover::-ms-fill-lower {
+            background: #FFDBA0;
+            }
+
+            input[type=range].range.slider-progress:active::-ms-fill-lower {
+            background: #724717;
+            }
+
+            
+            .color{
+                position: relative;
+                background-color: #221e14;
+                border-color: #5e563c;
+                width: 75px;
+                height: 75px;
+                border: none;
+                border-radius: 50%;
+            }
+            .timedate{
+                position: relative;
+                font-size: 16px;
+                transition: 0.1s;
+                background-color: #312d1f;  /* Цвет фона под заголовком */
+                color: #F2BF6C;  /*Цвет текста */
+                border:none;
+                border-radius:15px;
+                padding:13px;
+                min-height:30px; 
+                min-width: 120px;
+                font-size: 25px;
+            }
+            .timedate:hover {
+                background-color:#5e563c;
+                transition: 0.1s;
+            }
+            .timedate:focus {
+                border:none;
+            }
+            .timedate:active {
+                background-color: #724717;
+                transition: 0.1s;
+            }
+            .button {
+                position: relative;
+                font-size: 26px;
+                transition: 0.1s;
+                background-color: #312d1f;  /* Цвет фона под заголовком */
+                color: #F2BF6C;  /*Цвет текста */
+                border:none;
+                border-radius:15px;
+                padding:15px;
+                min-height:30px; 
+                min-width: 120px;
+            }
+            .button:hover {
+                background-color:#5e563c;
+                transition: 0.1s;
+            }
+            .button:focus {
+                border:none;
+            }
+            .button:active {
+                background-color: #724717;
+                transition: 0.1s;
+            }
             .switch {
               position: relative;
               display: inline-block;
@@ -39,11 +255,11 @@
             }
             
             input:checked + .slider {
-              background-color: #2196F3;
+              background-color: #724717;
             }
             
             input:focus + .slider {
-              box-shadow: 0 0 1px #2196F3;
+              box-shadow: 0 0 1px #5e563c;
             }
             
             input:checked + .slider:before {
@@ -67,17 +283,47 @@
         </style>
     </head>
     <body>
-        <h2>Sapr Server</h2>
-        <h1>Сервак работает)</h1>
         <h1 id="onflag_state">Состояние:</h1>
         <label class="switch" id="onflag_label">
             <input type="checkbox" onchange="toggleCheckbox(this)" id="onflag_toggle"><span class="slider round"></span>
         </label>
-        <h1 id="mode_state">Режим </h1> <button name="mode" onclick="modeButtonCheckbox(this)" id="mode_button">Переключить</button>
+        <h1 id="mode_state">Режим </h1>
+        <button class = "button" name="mode" onclick="modeButtonCheckbox(this)" id="mode_button">Переключить</button>
         <h1 id="hum_state">Влажность </h1>
         <h1 id="tem_state">Температура </h1>
+        <h1>
+            <label for="date">Установить дату </label>
+            <input class = "timedate" type="date" id="date" name="date"/>
+        </h1>
+        <h1>
+            <label for="time">Установить время </label>
+            <input class = "timedate" type="time" id="time" name="time"/>
+        </h1>
+        <button class = "button" name="set_time_button" onclick="setTimeButton(this)" id="set_time_button">Установить</button>
+        <button class = "button" name="sync_time_button" onclick="syncTimeButton(this)" id="sync_time_button">Синхронизировать дату и время</button>
+        <h1>Яркость дисплея </h1>
+        <label id="brightness_display_range_label">
+            <input class="range slider-progress" type="range" min="0" max="255" step="1" value="123" id="brightness_display_range" onchange ="setBright(this)"> 
+        </label>
+        <h1>Цвет подсветки </h1>
+        <label id="color_lighting_label">
+            <input class="color" type="color" id="color_lighting" name="color_lighting" value="#000000" onchange ="setColor(this)">
+        </label>
+        <h1>Яркость подсветки </h1>
+        <label id="brightness_lighting_range_label">
+            <input class="range slider-progress" type="range" min="0" max="100" step="1" value="50" id="brightness_lighting_range" onchange ="setBright(this)"> 
+        </label>
         <script>
-            var onflag_old = 0;
+            for (let e of document.querySelectorAll('input[type="range"].slider-progress')) { //Цикл для обновления прогресса у ползунка
+                e.style.setProperty('--value', e.value);
+                e.style.setProperty('--min', e.min == '' ? '0' : e.min);
+                e.style.setProperty('--max', e.max == '' ? '100' : e.max);
+                e.addEventListener('input', () => e.style.setProperty('--value', e.value));
+            }
+            var onflag_old = 0; //Нужен для корректного отображения тумблера
+            var brightness_display_old = 0; //Нужен для корректного отображения ползунка
+            var brightness_lighting_old = 0; //Нужен для корректного отображения ползунка
+            var color_lighting_old = "#000000"; //Нужен для корректного отображения цвета
             function update(){
                 var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
                 xhr.open("GET", "/update", true);
@@ -88,6 +334,13 @@
                     var tem = xhr.getResponseHeader("Tem"); //Считывание заголовка "Tem"
                     var onflag = xhr.getResponseHeader("Onflag"); //Считывание заголовка "Onflag"
                     var mode = xhr.getResponseHeader("Mode"); //Считывание заголовка "Mode"
+                    var brightness_display = xhr.getResponseHeader("BrightnessDisplay"); //Считывание заголовка "BrightnessDisplay"
+                    var brightness_lighting = xhr.getResponseHeader("BrightnessLighting"); //Считывание заголовка "BrightnessLighting"
+                    var red_led_value = xhr.getResponseHeader("RedLedValue"); //Считывание заголовка "RedLedValue"
+                    var green_led_value = xhr.getResponseHeader("GreenLedValue"); //Считывание заголовка "GreenLedValue"
+                    var blue_led_value = xhr.getResponseHeader("BlueLedValue"); //Считывание заголовка "BlueLedValue"
+                    var color_lighting = rgbToHex(parseInt(red_led_value,10), parseInt(green_led_value,10), parseInt(blue_led_value,10)); //Цвет в hex
+
                     var element_text = document.getElementById("onflag_state"); //Получаем элемент с текстом состояния часов
                     var str = "Состояние: ";
                     if(onflag == 1){
@@ -124,7 +377,85 @@
                     element_text = document.getElementById("tem_state"); //Получаем элемент с текстом режима часов
                     str = "Температура " + tem + "°C";
                     element_text.innerHTML = str; //Заменяем часть html кода у tem
+
+                    if(brightness_display != brightness_display_old)
+                    {
+                        element_text = document.getElementById("brightness_display_range_label"); //Получаем ползунок яркости дисплея
+                        str = "<input class=\"range slider-progress\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" value=\"" + brightness_display + "\" id=\"brightness_display_range\" onchange =\"setBright(this)\">";
+                        element_text.innerHTML = str; //Заменяем часть html кода у "brightness_display_range"
+                        brightness_display_old = brightness_display;
+                    }
+
+                    if(brightness_lighting != brightness_lighting_old)
+                    {
+                        element_text = document.getElementById("brightness_lighting_range_label"); //Получаем ползунок яркости подсветки
+                        str = "<input class=\"range slider-progress\" type=\"range\" min=\"0\" max=\"100\" step=\"1\" value=\"" + brightness_lighting + "\" id=\"brightness_lighting_range\" onchange =\"setBright(this)\">";
+                        element_text.innerHTML = str; //Заменяем часть html кода у "brightness_lighting_range"
+                        brightness_lighting_old = brightness_lighting;
+                    }
+
+                    if(color_lighting != color_lighting_old)
+                    {
+                        element_text = document.getElementById("color_lighting_label"); //Получаем элемент настройки цвета
+                        str = "<input class=\"color\" type=\"color\" id=\"color_lighting\" name=\"color_lighting\" value=\"" + String(color_lighting) + "\" onchange =\"setColor(this)\">";
+                        element_text.innerHTML = str; //Заменяем часть html кода у "brightness_lighting_range"
+                        color_lighting_old = color_lighting;
+                    }
+                    for (let e of document.querySelectorAll('input[type="range"].slider-progress')) { //Цикл для обновления прогресса у ползунка
+                        e.style.setProperty('--value', e.value);
+                        e.style.setProperty('--min', e.min == '' ? '0' : e.min);
+                        e.style.setProperty('--max', e.max == '' ? '100' : e.max);
+                        e.addEventListener('input', () => e.style.setProperty('--value', e.value));
+                    }
                 };  
+                xhr.send();
+            }
+            function hexToRGB(h) { //Функция преобразования hex в rgb
+                let r = 0, g = 0, b = 0;
+
+                // 3 digits
+                if (h.length == 4) {
+                    r = "0x" + h[1] + h[1];
+                    g = "0x" + h[2] + h[2];
+                    b = "0x" + h[3] + h[3];
+
+                // 6 digits
+                } else if (h.length == 7) {
+                    r = "0x" + h[1] + h[2];
+                    g = "0x" + h[3] + h[4];
+                    b = "0x" + h[5] + h[6];
+                }
+                
+                return +r + ";" + +g + ";" + +b;
+            }
+            function rgbToHex(r, g, b) { //Функция преобразования rgb в hex
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+            }
+            function setColor(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+hexToRGB(element.value)+";");
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function setBright(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+element.value);
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function setTimeButton(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                var time_text = document.getElementById("time");
+                var date_text = document.getElementById("date");
+                xhr.open("GET", "/update?output="+element.id+"&state="+time_text.value+":00;"+date_text.value+";"); //Получаем элемент с текстом состояния часов, true);
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function syncTimeButton(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                var now = new Date();
+                xhr.open("GET", "/update?output=set_time_button&state="+String(now.getHours())+":"+String(now.getMinutes())+":"+String(now.getSeconds())+";"+String(now.getFullYear())+"-"+String(now.getMonth()+1)+"-"+String(now.getDate())+";"); //Получаем элемент с текстом состояния часов, true);
+                xhr.responseType = 'text';
                 xhr.send();
             }
             function modeButtonCheckbox(element){
