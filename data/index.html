@@ -4,6 +4,7 @@
         <title>Sapr Server</title>
         <meta charset="utf-8">
         <meta name="author" content="Sapr">
+        <link rel="icon" type="image/png" href="/favicon.ico">
         <style>
             body{
                 background-color: #221e14; /* Цвет фона веб-страницы */
@@ -320,10 +321,10 @@
                 e.style.setProperty('--max', e.max == '' ? '100' : e.max);
                 e.addEventListener('input', () => e.style.setProperty('--value', e.value));
             }
-            var onflag_old = 0; //Нужен для корректного отображения тумблера
-            var brightness_display_old = 0; //Нужен для корректного отображения ползунка
-            var brightness_lighting_old = 0; //Нужен для корректного отображения ползунка
-            var color_lighting_old = "#000000"; //Нужен для корректного отображения цвета
+            var onflag_old = -1; //Нужен для корректного отображения тумблера
+            var brightness_display_old = -1; //Нужен для корректного отображения ползунка
+            var brightness_lighting_old = -1; //Нужен для корректного отображения ползунка
+            var color_lighting_old = "-#000000"; //Нужен для корректного отображения цвета
             function update(){
                 var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
                 xhr.open("GET", "/update", true);
