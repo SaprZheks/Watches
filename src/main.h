@@ -25,8 +25,8 @@
 #include "SPIFFS.h"
 #include <ArduinoJson.h>
 
-const char* ssid = ""; //SSID вставить свой
-const char* password = ""; //Пароль вставить свой
+const char* ssid = "Evgeniy"; //SSID вставить свой
+const char* password = "stepanova"; //Пароль вставить свой
 iarduino_RTC rtc(RTC_DS3231); //Объявление RTC-модуля
 iarduino_DHT dht(DHTPIN); //Объявление датчика
 const bool symbols[80][8] = {
