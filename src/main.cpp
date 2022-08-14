@@ -14,15 +14,43 @@ void setup()
   pinMode(RED_LED,OUTPUT);
   pinMode(GREEN_LED,OUTPUT);
   pinMode(BLUE_LED,OUTPUT);
+  pinMode(SD_CS,OUTPUT);
+
+  digitalWrite(SD_CS,HIGH);
   digitalWrite(OE,LOW);
   digitalWrite(SBROS,HIGH);
   digitalWrite(LATCH,HIGH);
   attachInterrupt(digitalPinToInterrupt(BUTTON_1),buttons_interrupt1,RISING); //Настройка аппаратного прерывания для кнопок
   attachInterrupt(digitalPinToInterrupt(BUTTON_2),buttons_interrupt2,RISING);
-
+  SPI.begin(SPI_SCK,SPI_MISO,SPI_MOSI);
   Serial.begin(9600); //Максимальная скорость 9600 бод, если поставить больше, будут иероглифы
   rtc.begin();
-  timer_dht.start(TIMER_DHT); //Начинаем таймер
+  if(!SD.begin(SD_CS)){     //Инициализация SD-карты
+    Serial.println("Ошибка при чтении карты!");
+    return;
+  }
+  uint8_t cardType = SD.cardType();
+  if(cardType == CARD_NONE){
+    Serial.println("Неподдерживаемый тип карты!");
+    return;
+  }
+  Serial.print("Тип SD-карты: ");
+  if(cardType == CARD_MMC){
+    Serial.println("MMC");
+  } else if(cardType == CARD_SD){
+    Serial.println("SDSC");
+  } else if(cardType == CARD_SDHC){
+    Serial.println("SDHC");
+  } else {
+    Serial.println("UNKNOWN");
+  }
+  uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+  Serial.printf("Размер SD-карты: %lluмб\n", cardSize);
+
+  audio.setPinout(I2S_BCLK,I2S_LRC,I2S_DOUT);
+  audio.setVolume(21);
+
+  timer_dht.loop(TIMER_DHT); //Начинаем таймер
   if(!SPIFFS.begin(true)) //Запуск SPIFFS
   {
     Serial.println("Произошла ошибка при монтаже SPIFFS");
@@ -64,11 +92,11 @@ void setup()
         }
       }else if(inputMessage1 == "set_time_button") //Если ткнули на "Установить дату и время" (Или на "Синхронизировать дату и время")
       {
-        String data[6] = {"  ","  ","  ","  ","  ","  "}; //h,m,s,y,m,d
+        String data[7] = {"  ","  ","  ","  ","  ","  ","  "}; //h,m,s,y,m,d,day of week
         int j = 0; //Счётчик символов строки InputMessage2
         int k = 0; //Номер элемента в строке 1-й переменной (секунд, минут, ...)
         bool error_set_time_flag = 0;
-        for(int i=0;i<6;i++)
+        for(int i=0;i<7;i++)
         {
           k = 0;
           while((inputMessage2[j] != ':')&&(inputMessage2[j] != '-')&&(inputMessage2[j] != ';')) //Пока не наткнёмся на : - ;
@@ -81,8 +109,8 @@ void setup()
               error_set_time_flag = 1;
               break; //Выходим из цикла for, как только замечаем ошибку
           }
-          if(inputMessage2[j] == ';')
-            j+=2; //Если наткнулись на ; следом будет год, т.е. лишние 2 символа
+          if(inputMessage2[j] == ';') //Если наткнулись на ; следом будет год, т.е. лишние 2 символа
+            j+=2; 
           j++;
         }
         if(error_set_time_flag == 0) //Если нет ошибок чтения, запись чисел в соответствующие переменные и установка флага для установки времени
@@ -93,6 +121,7 @@ void setup()
           y = data[3].toInt();
           mon = data[4].toInt();
           d = data[5].toInt();
+          dofw = data[6].toInt(); //День недели
           rtc_set_flag = 1; //Установка флага для установки даты и времени
         }
       }else if(inputMessage1 == "brightness_display_range"){ //Если ткнули на ползунок яркости дисплея
@@ -194,7 +223,7 @@ void setup()
   ledcAttachPin(BLUE_LED, blue_led_pwm_channel);
   ledcWrite(blue_led_pwm_channel, (int)((float)blue_led_value * (float)brightness_lighting/100));
   Serial.println("brightness_display = " + (String)brightness_display + "\n red_led_value = " + (String)red_led_value + "\n green_led_value = " + (String)green_led_value + "\n blue_led_value = " + (String)blue_led_value);
-  timer_wifi.start(TIMER_WIFI); //Начинаем таймер
+  timer_wifi.loop(TIMER_WIFI); //Начинаем таймер
 }
 
 void loop() //Бесконечный цикл
@@ -246,6 +275,25 @@ void loop() //Бесконечный цикл
           str += (String)hum + "%";
         }else{
           str += "ERROR";
+        }
+        if(str != str_old) //Если строка не совпадает с предыдущей
+        {
+          convert_str(str,str.length(),str_b); //Заполняем байт-кодом строку str_b
+          push(str_b,len); //Выводим содержимое str_b
+          str_old = str; //Обновляем старую строку
+        }
+        break;
+      case ALARM: //Режим будильника
+        if(alarm_flag == 0) //Если будильник только был запущен
+        {
+          timer_alarm_blink.loop(TIMER_ALARM); //Устанавливаем таймер для моргания экраном
+          alarm_flag = 1;
+        }
+        if(alarm_time_mode == 0)
+        {
+          str = rtc.gettime("H:i:s"); //Получаем строку из RTC модуля
+        }else{
+          str = " "; //Пустая строка
         }
         if(str != str_old) //Если строка не совпадает с предыдущей
         {

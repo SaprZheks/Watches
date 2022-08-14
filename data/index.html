@@ -370,6 +370,8 @@
                         str += "Температура";
                     }else if(mode == 3){
                         str += "Влажность";
+                    }else if(mode == 4){
+                        str += "Будильник";
                     }
                     element_text.innerHTML = str; //Заменяем часть html кода у mode
                     element_text = document.getElementById("hum_state"); //Получаем элемент с текстом режима часов
@@ -448,14 +450,15 @@
                 var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
                 var time_text = document.getElementById("time");
                 var date_text = document.getElementById("date");
-                xhr.open("GET", "/update?output="+element.id+"&state="+time_text.value+":00;"+date_text.value+";"); //Получаем элемент с текстом состояния часов, true);
+                var date = new Date(date_text.value);
+                xhr.open("GET", "/update?output="+element.id+"&state="+time_text.value+":00;"+date_text.value+"-"+date.getDay()+";"); //Получаем элемент с текстом состояния часов, true);
                 xhr.responseType = 'text';
-                xhr.send();
+                xhr.send();  
             }
             function syncTimeButton(element){
                 var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
                 var now = new Date();
-                xhr.open("GET", "/update?output=set_time_button&state="+String(now.getHours())+":"+String(now.getMinutes())+":"+String(now.getSeconds())+";"+String(now.getFullYear())+"-"+String(now.getMonth()+1)+"-"+String(now.getDate())+";"); //Получаем элемент с текстом состояния часов, true);
+                xhr.open("GET", "/update?output=set_time_button&state="+String(now.getHours())+":"+String(now.getMinutes())+":"+String(now.getSeconds())+";"+String(now.getFullYear())+"-"+String(now.getMonth()+1)+"-"+String(now.getDate())+"-"+String(now.getDay())+";"); //Получаем элемент с текстом состояния часов, true);
                 xhr.responseType = 'text';
                 xhr.send();
             }
