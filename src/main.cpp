@@ -224,6 +224,10 @@ void setup()
   ledcWrite(blue_led_pwm_channel, (int)((float)blue_led_value * (float)brightness_lighting/100));
   Serial.println("brightness_display = " + (String)brightness_display + "\n red_led_value = " + (String)red_led_value + "\n green_led_value = " + (String)green_led_value + "\n blue_led_value = " + (String)blue_led_value);
   timer_wifi.loop(TIMER_WIFI); //Начинаем таймер
+  bool ddd[7] = {0,0,1,0,0,0,0};
+  alarms = new Alarm[quantity_alarms]; //Выделение памяти с помощью Дефолтного конструктора Alarm()
+  alarms[0].time_start = "18:45";
+  alarms[1].time_start = "18:46";
 }
 
 void loop() //Бесконечный цикл

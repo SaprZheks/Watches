@@ -160,7 +160,7 @@ volatile bool alarm_stop_flag = 0; //Флаг для остановки буди
 volatile bool alarm_shift_flag = 0;//Флаг для переноса будильника          //Будильник 
 volatile bool alarm_changed_flag = 1; //Флаг изменения текущего будильника //
 volatile int current_alarm = -1; //Индекс текущего будильника              //                                       
-volatile int quantity_alarms = 1; //Количество будильников                 //
+volatile int quantity_alarms = 2; //Количество будильников                 //
 ////////////////////////////////////////////////////////////////////////////
 Audio audio;
 
@@ -185,7 +185,7 @@ class Timer //Класс таймера
     {
       active_flag = 0;
       overflow_flag = 0;
-    };
+    }
     void loop(volatile unsigned long interval = 0) //Циклическая функция таймера
     {
       if(active_flag == 0) //Если таймер еще не запущен
@@ -196,7 +196,7 @@ class Timer //Класс таймера
         active_flag = 1; //Таймер активирован
         if(time_2 < time_1) overflow_flag = 1; //Если было переполнение, то надо об этом знать
       }
-    };
+    }
     bool check() //Функция проверки достижения нужного времени
     {
       volatile unsigned long time_now = millis(); //Считываем текущее время
@@ -218,13 +218,13 @@ class Timer //Класс таймера
         }
         else return 0;
       }
-    };
+    }
 };
 class Alarm //Класс будильника
 {
   public:
     bool active = 1;                                                              //Включен ли будильник
-    String time_start = "18:45";                                                  //Время начала будильника
+    String time_start = "09:00";                                                  //Время начала будильника
     bool days[7] = {0,0,1,0,0,0,0}; 
     int check_sum_single(){ //Метод для подсчёта контрольной суммы дней недели
       int c = 0;
@@ -236,15 +236,17 @@ class Alarm //Класс будильника
     }
     int check_sum = check_sum_single(); //Контрольная сумма, нужна, чтоб понимать, что будильник одноразовый                                              //В какие дни активен (Вс,Пн,Вт,Ср,Чт,Пт,Сб)
     String track_name = "We Came As Romans feat. Caleb Shomo - Black Hole.mp3";   //Имя трека
-    unsigned long interval = 15000;                                               //Продолжительность будильника
-    bool shift_active = 0;                                                         //Перенесен ли будильник
-    unsigned long shift_interval = 4000;                                           //Продолжительность переноса будильника 3 секунды
+    unsigned long interval = 70000;                                               //Продолжительность будильника
+    int volume = 21;                                                              //Громкость будильника (От 1 до 21)
+    bool shift_active = 0;                                                        //Перенесен ли будильник
+    unsigned long shift_interval = 30000;                                          //Продолжительность переноса будильника 3 секунды
     volatile bool run_flag = 0;                                                   //Флаг, показывающий, выполняется ли будильник
     volatile bool done_flag = 0;                                                  //Флаг, показывающий, завершён ли будильник
     Timer timer;
 
     void stop() //Функция остановки будильника
     {
+      Serial.println("Stop");
       run_flag = 0;
       done_flag = 1;
       shift_active = 0;
@@ -253,7 +255,7 @@ class Alarm //Класс будильника
       if(check_sum == 0) //Если будильник одноразовый, то отключить его
         active = 0;
       timer.clean(); //Очистка таймера, ибо он может быть прерван из-за нажатия кнопки (Это нужная строчка!)
-    };
+    }
     void shift() //Функция переноса будильника (остановка + таймер переноса)
     {
       run_flag = 0;
@@ -262,18 +264,17 @@ class Alarm //Класс будильника
       alarm_flag = 0; 
       alarm_time_mode = 0;
       timer.clean(); //Очистка таймера
-    };
+    }
     bool checkStart() //Функция проверки для старта будильника (с защитой от двойного старта и старта во время уже запущенного будильника)
     {
       if(run_flag == 0) //Если будильник ещё не выполняется
       {
         if(shift_active == 1) //Если будильник перенесли
         {
-          Serial.println("Shift active == 1");
           timer.loop(shift_interval); //Запустить таймер для повторного запуска будильника (если он уже запущен, ничего не произойдет)
           if(timer.check()) //Если пора врубать повторный будильник
           {
-            Serial.println("shift start");
+            Serial.println("Перенос начат");
             run_flag = 1;
             timer.loop(interval); //Очищаем старый таймер и пускаем новый для проигрывания музыки
             String path = "/Music/" + track_name;
@@ -290,14 +291,13 @@ class Alarm //Класс будильника
             {
               if(done_flag == 0)                    //Если будильник еще не был завершён
               {
-                Serial.println("done_flag == 0");
                 if((days[moment.substring(6,1).toInt()])||(check_sum == 0)) //Если текущий день недели и тот, что хранится в будильнике, совпадают или это активный одноразовый будильник, включить будильник
                 {
-                  Serial.println("active start");
                   run_flag = 1; //Будильник запущен
                   timer.loop(interval); //Запустить таймер
                   String path = "/Music/" + track_name; //Путь к файлу с треком
                   audio.connecttoFS(SD,path.c_str()); //Подрубаем музон
+                  audio.setVolume(volume); //Устанавливаем громкость
                   onflag = 1; //Включить экран
                   regime = ALARM; //Переключить режим в состояние будильника
                   return 1;
@@ -310,7 +310,7 @@ class Alarm //Класс будильника
         }
       }
       return 0;
-    };
+    }
     bool checkStop()
     {
       if(run_flag) //Будильник запущен
@@ -320,20 +320,33 @@ class Alarm //Класс будильника
         audio.loop(); //Забиваем буфер усилителя
         if(timer.check() && run_flag) //Если пора вырубать (run_flag для переноса будильника)
         {
-          Serial.println("stop");
           stop();
           return 1;
         }
       }
       return 0;
-    };   
+    }
+    Alarm(bool act, const char t_st[], bool d[],const char tr_n[], unsigned long in,unsigned long sh_in,int v) //Конструктор класса
+    {
+      active = act;           //Включен ли будильник
+      time_start = t_st;      //Время начала будильника
+      for(int i=0;i<7;i++)
+      {
+        days[i] = d[i];               //В какие дни активен (Вс,Пн,Вт,Ср,Чт,Пт,Сб)
+      }
+      track_name = tr_n;      //Имя трека
+      interval = in;          //Продолжительность будильника
+      shift_interval = sh_in; //Продолжительность переноса будильника 3 секунды
+      volume = v;             //Громкость будильника (От 1 до 21)
+    }
+    Alarm(){}
 };
 Timer timer_chatter; //Создаем таймер для контроля дребезга
 Timer timer_dht; //Создаем таймер для контроля DHT22
 Timer timer_wifi; //Создаем таймер для контроля wifi подключения
 Timer timer_ws; //Создаем таймер для контроля ws
 Timer timer_alarm_blink;//Создаем таймер для моргания экрана во время звонка будильника
-Alarm alarms[1];       
+Alarm* alarms = nullptr;
 volatile bool wifi_connect_status = 0;
 IPAddress local_IP(192, 168, 1, 184); //Параметры статического IP-адреса
 IPAddress gateway(192, 168, 1, 1); //Параметры шлюза
@@ -548,7 +561,6 @@ void alarm_control() //Функция контроля будильников
 {
   if(alarm_stop_flag == 1) //Если надо остановить будильник, останавливаем все будильники
   {
-    Serial.println("alarm_stop_flag == 1");
     alarms[current_alarm].stop(); //Завершить будильник
     regime = CLOCK;
     current_alarm = -1;
@@ -556,7 +568,6 @@ void alarm_control() //Функция контроля будильников
   }
   if(alarm_shift_flag == 1) //Если надо перенести будильник, переносим текущий
   {
-    Serial.println("alarm_shift_flag == 1");
     alarms[current_alarm].shift(); //Врубаем перенос текущего будильника
     regime = CLOCK;
     alarm_shift_flag = 0;
@@ -565,7 +576,6 @@ void alarm_control() //Функция контроля будильников
   {
     if(alarms[i].checkStart()) //Если выбранный будильник надо запустить
     {
-      Serial.println("Выбор одного самого позднего будильника из всех будильников");
       current_alarm = i; //Обновляем индекс текущего будильника
       alarm_changed_flag = 1; //Поднимаем флаг изменения текущего будильника
     }
@@ -584,7 +594,6 @@ void alarm_control() //Функция контроля будильников
 
   if(current_alarm != -1) //Если есть хоть 1 работающий будильник
   {
-    Serial.println("Ебашим");
     if(alarms[current_alarm].checkStop()) //Если будильник пора завершить
     {
       current_alarm = -1;
