@@ -48,7 +48,7 @@ void setup()
   Serial.printf("Размер SD-карты: %lluмб\n", cardSize);
 
   audio.setPinout(I2S_BCLK,I2S_LRC,I2S_DOUT);
-  audio.setVolume(21);
+  
 
   timer_dht.loop(TIMER_DHT); //Начинаем таймер
   if(!SPIFFS.begin(true)) //Запуск SPIFFS
@@ -224,10 +224,15 @@ void setup()
   ledcWrite(blue_led_pwm_channel, (int)((float)blue_led_value * (float)brightness_lighting/100));
   Serial.println("brightness_display = " + (String)brightness_display + "\n red_led_value = " + (String)red_led_value + "\n green_led_value = " + (String)green_led_value + "\n blue_led_value = " + (String)blue_led_value);
   timer_wifi.loop(TIMER_WIFI); //Начинаем таймер
-  bool ddd[7] = {0,0,1,0,0,0,0};
-  alarms = new Alarm[quantity_alarms]; //Выделение памяти с помощью Дефолтного конструктора Alarm()
-  alarms[0].time_start = "18:45";
-  alarms[1].time_start = "18:46";
+  alarmManager.newAlarm("09:03","The Endless Line - Take It Off.mp3",60000,60000,21,1);
+  alarmManager.newAlarm("09:01","Bush.mp3",60000,60000,21,1);
+  alarmManager.newAlarm("09:02","Bush.mp3",60000,60000,21,1);
+  alarmManager.newAlarm("09:04","Bush.mp3",60000,60000,21,1);
+  alarmManager.deleteAlarm(1); //Удаляем будильник с индексом 1 (Важно помнить, что по мере добавления новых будильников их порядок может меняться сортировкой)
+  alarmManager.newAlarm("09:05","Bush.mp3",60000,60000,21,1);
+  alarmManager.newAlarm("09:06","Bush.mp3",60000,60000,21,1);
+  alarmManager.newAlarm("09:07","Bush.mp3",60000,60000,21,1);
+  alarmManager.newAlarm("09:08","Bush.mp3",60000,60000,21,1);
 }
 
 void loop() //Бесконечный цикл
