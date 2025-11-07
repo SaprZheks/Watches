@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SaprZheks Server</title>
+        <meta charset="utf-8">
+        <meta name="author" content="SaprZheks">
+        <link rel="icon" type="image/png" href="/favicon.ico">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <h1 class="first-header">Часы</h1>
+        
+        <div class="line">
+            <div class="box">
+                <div class="line" style="width: 23em;">
+                    <h1 id="onflag_state">Состояние:</h1>
+                    <label class="switch align-right" id="onflag_label">
+                        <input type="checkbox" onchange="toggleCheckbox(this)" id="onflag_toggle"><span class="slider round"></span>
+                    </label>
+                </div>
+                <h1 id="mode_state">Режим: </h1>
+                <button class = "button" name="mode" onclick="modeButtonCheckbox(this)" id="mode_button">Переключить</button>
+            </div>
+            <div class="box">
+                <h1 id="hum_state">Влажность </h1>
+                <h1 id="tem_state">Температура </h1>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class ="line">
+                <h1>Установить дату </h1>
+                <input class = "timedate margin-left" type="date" id="date" name="date"/>
+            </div>
+            
+            <div class ="line">
+                <h1>Установить время</h1>
+                <input class = "timedate margin-left" type="time" id="time" name="time"/>
+            </div>
+
+            <div class ="line">
+                <button class = "button" name="set_time_button" onclick="setTimeButton(this)" id="set_time_button">Установить</button>
+                <button class = "button margin-left" name="sync_time_button" onclick="syncTimeButton(this)" id="sync_time_button">Синхронизировать дату и время</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class ="line line-slider">
+                <h1>Яркость дисплея </h1>
+                <label id="brightness_display_slider_label">
+                    <div class="range margin-left" style="--value: 100" id="brightness_display_slider_div">
+                        <div class="track"></div>
+                        <div class="progress"></div>
+                        <input
+                            class="range-input"
+                            type="range"
+                            min="0"
+                            max="100"
+                            value="100"
+                            step="1"
+                            id="brightness_display_slider_range"
+                            onchange ="setBright(this)">
+                        <output class="range-output" id="brightness_display_slider_output">100</output>
+                    </div>
+                </label>
+            </div>
+        </div>
+        
+        <div class="box">
+            <div class ="line line-slider">
+                <h1>Яркость подсветки </h1>
+                <label id="brightness_lighting_slider_label">
+                    <div class="range margin-left" style="--value: 100" id="brightness_lighting_slider_div">
+                        <div class="track"></div>
+                        <div class="progress"></div>
+                        <input
+                            class="range-input"
+                            type="range"
+                            min="0"
+                            max="100"
+                            value="100"
+                            step="1"
+                            id="brightness_lighting_slider_range"
+                            onchange ="setBright(this)">
+                        <output class="range-output" id="brightness_lighting_slider_output">100</output>
+                    </div>
+                </label>
+            </div>
+            
+            <h1>Цвет подсветки </h1>
+            <label id="color_lighting_label">
+                <input class="color" type="color" id="color_lighting" name="color_lighting" value="#000000" style="--color-selector-shadow: black" onchange="setColor(this)">
+            </label>
+        </div>
+       
+        <style>
+                        /*Цвета*/
+            :root {
+            --text-color: #d5ff63;
+            --text-shadow: #d5ff63;
+            --back-button-color: #480072;
+            --active-button-shadow: #00a78b;
+            --hover-back-button-color: #8A0447;
+            --active-back-button-color: #00A78A;
+            --active-text-color: #E3FF02;
+            --back-box-color: #500D43;
+            --active-scale: 1.03;
+            --text-back-selection-color: #ff3700a0;
+            --text-selection-color: #fbff00;
+            --slider-accent-color: #ff0040;
+            --slider-accent-shadow: #ff0040;
+            }
+
+            ::selection {
+                background-color: var(--text-back-selection-color);
+                color: var(--text-selection-color); /* Цвет текста при выделении */
+            }
+
+            @font-face {
+                font-family: "Comfortaa";
+                font-style: normal;
+                font-weight: 400;
+                src: url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+                    
+            }
+
+            .first-header {
+                font-size: 72px;
+                margin-bottom: 25px;
+            }
+
+            .margin-right {
+                margin-right: 1em;
+            }
+
+            .margin-left {
+                margin-left: 0.7em;
+            }
+
+            .align-right {
+                margin-left: auto;
+            }
+
+            .box {
+                display: flex;
+                flex-direction: column;
+                gap: 0.7em;
+                position: relative;
+                background: var(--back-box-color);
+                width: fit-content;
+                border-radius: 1.5em;
+                padding: 1em;
+                margin: 1em;
+                box-shadow: 1em 1em 2em rgb(24, 3, 18);
+                /*border: 2px solid #3a3a3a;*/
+            }
+
+            .line {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .line-slider {
+                align-items: flex-end;
+            }
+
+            body{
+                background-color: #320A2A; /* Цвет фона веб-страницы */
+                font-family: 'Comfortaa', sans-serif;
+                
+            }
+
+            h1 {
+                color: var(--text-color); /* Цвет текста */
+                text-shadow: 0em 0em 0.3em var(--text-shadow);
+                margin: 0em;
+            }
+
+            h2 {
+                color: var(--text-color); /* Цвет текста */
+                text-shadow: 0em 0em 0.3em var(--text-shadow);
+                margin: 0em;
+            }
+
+            .color{
+                --color-selector-shadow: black;
+                position: relative;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                width: 75px;
+                height: 75px;
+                padding: 0;
+                background-color: #221e14;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 0 0 2em var(--color-selector-shadow);
+            }
+
+            .color::-webkit-color-swatch-wrapper {
+                border: none;
+                padding: 0;
+            }
+
+            .color::-webkit-color-swatch {
+                border: none;
+                
+                padding: 0;
+            }
+
+            
+
+            .timedate{
+                position: relative;
+                font-size: 16px;
+                font-family: 'Comfortaa', sans-serif;
+                transition: 0.1s;
+                background-color: var(--back-button-color);  /* Цвет фона под заголовком */
+                color: var(--text-color);  /*Цвет текста */
+                border:none;
+                border-radius:15px;
+                padding:13px;
+                min-height:30px; 
+                min-width: 120px;
+                font-size: 25px;
+                box-shadow:
+                    0em 0em 8em rgba(0,0,0,0),
+                    inset 0em 0em 2em rgba(0, 0, 0, 0.7);
+                text-shadow: 0em 0em 0.3em var(--text-shadow);
+                cursor: pointer;
+            }
+            
+            .timedate:hover {
+                background-color:var(--hover-back-button-color);
+                transition: 0.1s;
+            }
+            .timedate:focus {
+                border:none;
+            }
+            .timedate:active {
+                background-color: var(--active-back-button-color);
+                color: var(--active-text-color);
+                box-shadow: 
+                    0em 0em 1em var(--active-button-shadow),
+                    inset 0em 0em 0em rgba(0, 0, 0, 0);
+                transform: scale(var(--active-scale));
+                transition: 0.1s;
+            }
+            .button {
+                position: relative;
+                font-size: 26px;
+                font-family: 'Comfortaa', sans-serif;
+                transition: 0.1s;
+                background-color: var(--back-button-color);  /* Цвет фона под заголовком */
+                color: var(--text-color);  /*Цвет текста */
+                border:none;
+                border-radius:15px;
+                padding:15px;
+                min-height:30px; 
+                min-width: 120px;
+                box-shadow:
+                    0em 0em 8em rgba(0,0,0,0),
+                    inset 0em 0em 2em rgba(0, 0, 0, 0.7);
+                text-shadow: 0em 0em 0.3em var(--text-shadow);
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color: var(--hover-back-button-color);
+                transition: 0.1s;
+            }
+            .button:focus {
+                border:none;
+            }
+            .button:active {
+                background-color: var(--active-back-button-color);
+                color: var(--active-text-color);
+                box-shadow: 
+                    0em 0em 1em var(--active-button-shadow),
+                    inset 0em 0em 0em rgba(0, 0, 0, 0);
+                transform: scale(var(--active-scale));
+                transition: 0.1s;
+            }
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+                cursor: pointer;
+            }
+
+            .switch input {display:none;}
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: var(--back-button-color);
+                box-shadow:
+                    0em 0em 8em rgba(0,0,0,0),
+                    inset 0em 0em 2em rgba(0, 0, 0, 0.7);
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: var(--text-color);
+                box-shadow: 0em 0em 0.3em var(--text-shadow);
+                -webkit-transition: .4s;
+                transition: 0.1s;
+            }
+
+            input:checked + .slider {
+                background-color: var(--active-back-button-color);
+                box-shadow: 
+                    0em 0em 1em var(--active-button-shadow),
+                    inset 0em 0em 0em rgba(0, 0, 0, 0);
+            }
+
+            input:hover + .slider {
+                background-color: var(--hover-back-button-color);
+                transition: 0.1s;
+            }
+
+            input:checked:hover + .slider {
+                background-color: var(--active-back-button-color);
+                box-shadow: 
+                    0em 0em 1em var(--active-button-shadow),
+                    inset 0em 0em 0em rgba(0, 0, 0, 0);
+            }
+
+            input:checked + .slider:before {
+                -webkit-transform: translateX(26px);
+                -ms-transform: translateX(26px);
+                transform: translateX(26px);
+                background-color: var(--active-text-color);
+                box-shadow: 0em 0em 0.3em var(--text-shadow);
+            }
+
+            /* Rounded sliders */
+            .slider.round {
+                border-radius: 34px;
+            }
+
+            .slider.round:before {
+                border-radius: 50%;
+            }
+            .positioned {
+                position: relative;
+                left: 300px;
+            }
+
+            /* Ползунки */
+            .range {
+                --slider-widget-width: 210px;
+                --slider-font-size: 20px;
+                --slider-thumb-diam: 30px;
+                --slider-range-height: var(--slider-thumb-diam);
+                --slider-input-top: calc(2 * var(--slider-font-size) + var(--slider-thumb-diam)/2 - var(--slider-range-height)/2);
+                --slider-track-height: 15px;
+                --slider-track-top: calc(var(--slider-input-top) + var(--slider-range-height)/2 - var(--slider-track-height)/2);;
+                --slider-progress-height: var(--slider-track-height);
+                --slider-progress-width: calc(var(--slider-thumb-diam)/2 + var(--value) * (var(--slider-widget-width) - var(--slider-thumb-diam))/100 );
+                --slider-output-padding-width: calc(var(--slider-font-size)/5);
+                --slider-output-left: var(--slider-progress-width);
+                --slider-widget-height: calc(var(--slider-thumb-diam) + 2*var(--slider-font-size));
+                --slider-margin-bottom: calc(-2*var(--slider-font-size));
+
+                position: relative;
+                display: grid;
+                width: var(--slider-widget-width);
+                height: var(--slider-widget-height);
+            }
+
+
+            .range-input {
+                position: absolute;
+                top: var(--slider-input-top);
+                margin: 0;
+                width: 100%;
+                height: var(--slider-range-height);
+                border-radius: 10px;
+                appearance: none;
+                background: transparent;
+                pointer-events: auto;
+                cursor: pointer;
+            }
+
+            .range-input::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: var(--slider-thumb-diam);
+                height: var(--slider-thumb-diam);
+                border: none;
+                border-radius: 50%;
+                background-color: var(--text-color);
+                box-shadow:
+                    inset 0 0 0 calc(var(--slider-thumb-diam) /6) var(--slider-accent-color),
+                    0 0 1em var(--slider-accent-shadow);
+                transition: 300ms;
+            }
+
+            .range-input::-moz-range-thumb {
+                width: var(--slider-thumb-diam);
+                height: var(--slider-thumb-diam);
+                border: none;
+                border-radius: 50%;
+                background-color: var(--text-color);
+                box-shadow:
+                    inset 0 0 0 calc(var(--slider-thumb-diam) /6) var(--slider-accent-color),
+                    0 0 1em var(--slider-accent-shadow);
+                transition: 300ms;
+            }
+
+            .range-input:hover::-webkit-slider-thumb {
+                box-shadow:
+                    inset 0 0 0 calc(var(--slider-thumb-diam) /3.7) var(--slider-accent-color),
+                    0 0 1.5em var(--slider-accent-shadow);
+            }
+
+            .range-input:hover::-moz-range-thumb {
+                box-shadow:
+                    inset 0 0 0 calc(var(--slider-thumb-diam) /3.7) var(--slider-accent-color),
+                    0 0 1.5em var(--slider-accent-shadow);
+            }
+
+            .range-input:active::-webkit-slider-thumb {
+                background-color: var(--active-text-color);
+                box-shadow:
+                    0 0 0 0 inset var(--slider-accent-color),
+                    0em 0em 2em var(--text-shadow);
+            }
+            .range-input:active::-moz-range-thumb {
+                background-color: var(--active-text-color);
+                box-shadow:
+                    0 0 0 0 inset var(--slider-accent-color),
+                    0em 0em 2em var(--text-shadow);
+            }
+
+            .track {
+                position: absolute;
+                top: var(--slider-track-top);
+                width: 100%;
+                height: var(--slider-track-height);
+                border-radius: calc(var(--slider-track-height)/2);
+                background-color: var(--back-button-color);
+                box-shadow:
+                    0em 0em 8em rgba(0,0,0,0),
+                    inset 0em 0em 1em rgba(0, 0, 0, 0.7);
+            }
+
+            .progress {
+                position: absolute;
+                top: var(--slider-track-top);
+                width: var(--slider-progress-width);
+                height: var(--slider-progress-height);
+                border-top-left-radius : calc(var(--slider-progress-height)/2);
+                border-bottom-left-radius : calc(var(--slider-progress-height)/2);
+                background-color: var(--active-back-button-color);
+                box-shadow: 0em 0em 1em var(--active-button-shadow);
+            }
+
+            .range-output {
+                position: absolute;
+                left: var(--slider-output-left);
+                margin: 0;
+                padding: 0 var(--slider-output-padding-width);
+                background: transparent;
+                border-radius: calc(var(--slider-font-size)/2);
+                font-family: 'Comfortaa', sans-serif;
+                font-size: var(--slider-font-size);
+                text-align: start;
+                color: var(--text-color); /* Цвет текста */
+                text-shadow: 0em 0em 0.3em var(--text-shadow);
+                box-shadow:
+                    0 0 0 0 rgba(0, 0, 0, 0);
+                transform: translateX(-50%);
+                user-select: none;
+                transition: 300ms;
+                pointer-events: none;
+                user-select: none;
+            }
+
+            .range-input:hover + .range-output {
+                background-color: var(--slider-accent-color);
+                color: var(--active-text-color); /* Цвет текста */
+                text-shadow: 0em 0em 0.3em var(--active-text-color);
+                box-shadow:
+                    0em 0em 3em 0.1em var(--slider-accent-color);
+                transition:
+                    background-color 300ms,
+                    box-shadow 300ms;
+            }
+
+            #brightness_display_range_label,
+            #brightness_lighting_range_label {
+                pointer-events: none;
+                user-select: none;
+            }
+
+            #color_lighting_label {
+                width: 75px;
+            }
+        </style>
+        
+        <script>
+            
+            
+            for (let range of document.querySelectorAll('.range-input')) {
+                range.addEventListener('input', handleInputRange)
+            }
+            
+            function handleInputRange(event) {
+                event.target.parentNode.style.setProperty(
+                    '--value',
+                    event.target.value
+                )
+                event.target.nextElementSibling.value = event.target.value;
+            }
+
+            for (let color_selector of document.querySelectorAll('.color')) {
+                color_selector.addEventListener('input',
+                    function(event) {
+                        handleInputColor(event.target);
+                    }
+                );
+            }
+
+            function handleInputColor(element) {
+                var selectedColor = element.value;
+                element.style.setProperty('--color-selector-shadow', selectedColor);
+            }
+
+            var onflag_old = -1; //Нужен для корректного отображения тумблера
+            var brightness_display_old = -1; //Нужен для корректного отображения ползунка
+            var brightness_lighting_old = -1; //Нужен для корректного отображения ползунка
+            var color_lighting_old = "-#000000"; //Нужен для корректного отображения цвета
+
+            function update(){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update", true);
+                xhr.responseType = 'text';
+                xhr.onload = function() //Когда сервер пришлёт ответ
+                {
+                    var hum = xhr.getResponseHeader("Hum"); //Считывание заголовка "Hum"
+                    var tem = xhr.getResponseHeader("Tem"); //Считывание заголовка "Tem"
+                    var onflag = xhr.getResponseHeader("Onflag"); //Считывание заголовка "Onflag"
+                    var mode = xhr.getResponseHeader("Mode"); //Считывание заголовка "Mode"
+                    var brightness_display = xhr.getResponseHeader("BrightnessDisplay"); //Считывание заголовка "BrightnessDisplay"
+                    var brightness_lighting = xhr.getResponseHeader("BrightnessLighting"); //Считывание заголовка "BrightnessLighting"
+                    var red_led_value = xhr.getResponseHeader("RedLedValue"); //Считывание заголовка "RedLedValue"
+                    var green_led_value = xhr.getResponseHeader("GreenLedValue"); //Считывание заголовка "GreenLedValue"
+                    var blue_led_value = xhr.getResponseHeader("BlueLedValue"); //Считывание заголовка "BlueLedValue"
+                    var color_lighting = rgbToHex(parseInt(red_led_value,10), parseInt(green_led_value,10), parseInt(blue_led_value,10)); //Цвет в hex
+
+                    var element_text = document.getElementById("onflag_state"); //Получаем элемент с текстом состояния часов
+                    var str = "Состояние: ";
+                    if(onflag == 1){
+                        str += "Вкл";
+                    }else{
+                        str += "Выкл";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода у onflag
+                    if(!(onflag == onflag_old)) {
+                        element_text = document.getElementById("onflag_label"); //Получаем элемент с галочкой состояния часов
+                        str = "<input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"onflag_toggle\"";
+                        if(onflag == 1){
+                            str += " checked";
+                        }
+                        str += "><span class=\"slider round\"></span>";
+                        element_text.innerHTML = str; //Заменяем часть html кода у onflag
+                        onflag_old = onflag;
+                    }
+                    element_text = document.getElementById("mode_state"); //Получаем элемент с текстом режима часов
+                    str = "Режим: ";
+                    if(mode == 0){
+                        str += "Время";
+                    }else if(mode == 1){
+                        str += "Дата";
+                    }else if(mode == 2){
+                        str += "Температура";
+                    }else if(mode == 3){
+                        str += "Влажность";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода у mode
+                    element_text = document.getElementById("hum_state"); //Получаем элемент с текстом режима часов
+                    str = "Влажность " + hum + "%";
+                    element_text.innerHTML = str; //Заменяем часть html кода у hum
+                    element_text = document.getElementById("tem_state"); //Получаем элемент с текстом режима часов
+                    str = "Температура " + tem + "°C";
+                    element_text.innerHTML = str; //Заменяем часть html кода у tem
+
+                    if(brightness_display != brightness_display_old)
+                    {
+                        // Получаем ползунок яркости дисплея
+                        slider_div = document.getElementById("brightness_display_slider_div");
+                        slider_range = document.getElementById("brightness_display_slider_range");
+                        slider_out = document.getElementById("brightness_display_slider_output");
+
+                        slider_div.style.setProperty(
+                            '--value',
+                            Math.round(brightness_display*100/255)
+                        );
+                        slider_range.value = Math.round(brightness_display*100/255);
+                        slider_out.value = Math.round(brightness_display*100/255);
+                        
+                        brightness_display_old = brightness_display;
+                    }
+
+                    if(brightness_lighting != brightness_lighting_old)
+                    {
+                        // Получаем ползунок яркости дисплея
+                        slider_div = document.getElementById("brightness_lighting_slider_div");
+                        slider_range = document.getElementById("brightness_lighting_slider_range");
+                        slider_out = document.getElementById("brightness_lighting_slider_output");
+
+                        slider_div.style.setProperty(
+                            '--value',
+                            Math.round(brightness_lighting*100/255)
+                        );
+                        slider_range.value = Math.round(brightness_lighting*100/255);
+                        slider_out.value = Math.round(brightness_lighting*100/255);
+                        
+                        brightness_lighting_old = brightness_lighting;
+                    }
+
+                    if(color_lighting != color_lighting_old)
+                    {
+                        color_wheel = document.getElementById("color_lighting"); // Получаем элемент настройки цвета
+                        color_wheel.value = color_lighting;
+                        color_wheel.style.setProperty('--color-selector-shadow', color_lighting);
+                        color_lighting_old = color_lighting;
+                    }
+
+                };  
+                xhr.send();
+            }
+            function hexToRGB(h) { //Функция преобразования hex в rgb
+                let r = 0, g = 0, b = 0;
+
+                // 3 digits
+                if (h.length == 4) {
+                    r = "0x" + h[1] + h[1];
+                    g = "0x" + h[2] + h[2];
+                    b = "0x" + h[3] + h[3];
+
+                // 6 digits
+                } else if (h.length == 7) {
+                    r = "0x" + h[1] + h[2];
+                    g = "0x" + h[3] + h[4];
+                    b = "0x" + h[5] + h[6];
+                }
+                
+                return +r + ";" + +g + ";" + +b;
+            }
+            function rgbToHex(r, g, b) { //Функция преобразования rgb в hex
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+            }
+            function setColor(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+hexToRGB(element.value)+";");
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function setBright(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+Math.round(element.value/100*255));
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function setTimeButton(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                var time_text = document.getElementById("time");
+                var date_text = document.getElementById("date");
+                var date = new Date(date_text.value);
+                xhr.open("GET", "/update?output="+element.id+"&state="+time_text.value+":00;"+date_text.value+"-"+date.getDay()+";"); //Получаем элемент с текстом состояния часов, true);
+
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function syncTimeButton(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                var now = new Date();
+                xhr.open("GET", "/update?output=set_time_button&state="+String(now.getHours())+":"+String(now.getMinutes())+":"+String(now.getSeconds())+";"+String(now.getFullYear())+"-"+String(now.getMonth()+1)+"-"+String(now.getDate())+"-"+String(now.getDay())+";"); //Получаем элемент с текстом состояния часов, true);
+                xhr.responseType = 'text';
+                xhr.send();
+            }
+            function modeButtonCheckbox(element){
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+1, true);
+                xhr.responseType = 'text';
+                xhr.onload = function() //Когда сервер пришлёт ответ
+                {
+                    var mode = xhr.getResponseHeader("Mode"); //Считывание заголовка "Mode"
+                    var element_text = document.getElementById("mode_state"); //Получаем элемент с текстом режима часов
+                    var str = "Режим: ";
+                    if(mode == 0){
+                        str += "Время";
+                    }else if(mode == 1){
+                        str += "Дата";
+                    }else if(mode == 2){
+                        str += "Температура";
+                    }else if(mode == 3){
+                        str += "Влажность";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода
+                };  
+                xhr.send();
+            }
+            function toggleCheckbox(element){ //Функция обработки галочки
+                var xhr = new XMLHttpRequest(); //Создание объекта запроса. XMLHttpRequest это API
+                xhr.open("GET", "/update?output="+element.id+"&state="+String(Number(element.checked)), true);
+                xhr.responseType = 'text';
+                xhr.onload = function() //Когда сервер пришлёт ответ
+                { 
+                    var onflag = xhr.getResponseHeader("Onflag"); //Считывание заголовка "Onflag"
+                    var element_text = document.getElementById("onflag_state"); //Получаем элемент с галочкой и текстом состояния часов
+                    var str = "Состояние: ";
+                    if(onflag == 1){
+                        str += "Вкл";
+                    }else{
+                        str += "Выкл";
+                    }
+                    element_text.innerHTML = str; //Заменяем часть html кода у onflag
+                };  
+                xhr.send();
+            }
+            setInterval(update,500);
+        </script>
+    </body>
+</html>
