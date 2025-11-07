@@ -1,3 +1,4 @@
+# 1
 В `src` добавьте файл `passwd.h ` со следующим содержанием
 
 ```
@@ -5,6 +6,13 @@
   #define WIFI_PASSWD "your_password"
 ```
 
+# 2
+Установите драйвера для ESP32
+
+# 3
+Установите PlatformIO в VSCode
+
+# 4
 Чтобы склонировать себе репозиторий, выполните
 ```
 git clone --recurse-submodules https://github.com/SaprZheks/Watches.git
