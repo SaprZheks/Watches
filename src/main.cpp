@@ -194,7 +194,7 @@ void setup()
   ledcSetup(blue_led_pwm_channel, 5000, 8);
   ledcAttachPin(BLUE_LED, blue_led_pwm_channel);
   ledcWrite(blue_led_pwm_channel, (int)((float)blue_led_value * (float)brightness_lighting/100));
-  Serial.println("brightness_display = " + (String)brightness_display + "\n red_led_value = " + (String)red_led_value + "\n green_led_value = " + (String)green_led_value + "\n blue_led_value = " + (String)blue_led_value);
+
   timer_wifi.loop(TIMER_WIFI); //Начинаем таймер
 }
 
